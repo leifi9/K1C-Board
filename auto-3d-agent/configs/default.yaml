@@ -1,0 +1,27 @@
+api_keys:
+  github: "YOUR_GITHUB_API_KEY"
+  reddit: "YOUR_REDDIT_API_KEY"
+
+model_parameters:
+  resolution: "high"
+  format: "obj"
+  optimization_level: "medium"
+
+ingestion:
+  text:
+    max_length: 500
+  image:
+    max_size: "5MB"
+  video:
+    max_duration: "60s"
+
+retrieval:
+  sources:
+    - "web"
+    - "github"
+    - "reddit"
+
+export:
+  formats:
+    - "step"
+    - "obj"
