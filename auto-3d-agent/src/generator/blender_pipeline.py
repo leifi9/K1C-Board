@@ -197,19 +197,82 @@ class BlenderPipeline(ModelInterface):
 
     def process_input_images(self, images: List[str]) -> Dict[str, Any]:
         """Process input images for reference"""
-        # TODO: Implement image processing for reference
-        # This will be enhanced with computer vision later
-        return {}
+        if not images:
+            return {}
+        
+        from ..ingestion.image_processor import ImageProcessor
+        
+        image_processor = ImageProcessor()
+        processed_images = []
+        
+        for image_path in images:
+            result = image_processor.process_image(image_path)
+            processed_images.append(result)
+        
+        # Aggregate features
+        all_shapes = []
+        all_colors = []
+        total_features = 0
+        
+        for img_data in processed_images:
+            if 'shapes' in img_data:
+                all_shapes.extend(img_data['shapes'])
+            if 'colors' in img_data:
+                all_colors.extend(img_data['colors'])
+            if 'features' in img_data:
+                total_features += len(img_data['features'])
+        
+        return {
+            'image_count': len(images),
+            'processed': processed_images,
+            'shapes_detected': all_shapes,
+            'dominant_colors': all_colors[:3] if all_colors else [],
+            'total_features': total_features
+        }
     
     def process_input_videos(self, videos: List[str]) -> Dict[str, Any]:
         """Process input videos for reference"""
-        # TODO: Implement video frame extraction and processing
-        return {}
+        if not videos:
+            return {}
+        
+        from ..ingestion.video_processor import VideoProcessor
+        
+        video_processor = VideoProcessor()
+        processed_videos = []
+        total_frames = 0
+        
+        for video_path in videos:
+            result = video_processor.process_video(video_path)
+            processed_videos.append(result)
+            total_frames += len(result)
+        
+        return {
+            'video_count': len(videos),
+            'processed': processed_videos,
+            'total_frames_analyzed': total_frames
+        }
     
     def process_input_links(self, links: List[str]) -> Dict[str, Any]:
         """Process input web links for reference"""
-        # TODO: Implement web scraping and content analysis
-        return {}
+        if not links:
+            return {}
+        
+        from ..retriever.web_search import WebSearch
+        
+        web_search = WebSearch()
+        processed_links = []
+        
+        for link in links:
+            # Treat each link as a search result
+            result = web_search.fetch_results([{'url': link, 'title': '', 'snippet': ''}])
+            if result:
+                processed_links.extend(result)
+        
+        return {
+            'link_count': len(links),
+            'processed': processed_links,
+            'content_fetched': len(processed_links)
+        }
 
     def generate_model(self, description: str, 
                       images: Optional[List[str]] = None,
@@ -315,6 +378,34 @@ class BlenderPipeline(ModelInterface):
                 'thread_angle': params.get('thread_angle', 60.0)
             }
         return {}
+    
+    def _update_params_from_features(self, params: Dict[str, Any], features: Dict[str, Any]):
+        """Update parameters based on image/video features"""
+        if not features:
+            return
+        
+        # Extract shape information from detected shapes
+        if 'shapes_detected' in features:
+            shapes = features['shapes_detected']
+            if shapes:
+                # Get most common shape type
+                shape_counts = {}
+                for shape in shapes:
+                    shape_type = shape.get('type', 'unknown')
+                    shape_counts[shape_type] = shape_counts.get(shape_type, 0) + 1
+                
+                if shape_counts:
+                    dominant_shape = max(shape_counts, key=shape_counts.get)
+                    if dominant_shape in ['circle', 'sphere']:
+                        params['type'] = 'sphere'
+                    elif dominant_shape in ['rectangle', 'square']:
+                        params['type'] = 'cube'
+        
+        # Update size based on feature count
+        if 'total_features' in features:
+            feature_count = features['total_features']
+            if feature_count > 50:
+                params['modifiers']['subdivision'] = {'levels': 2}
     
     def _extract_params_from_description(self, description: str) -> Dict[str, Any]:
         """Extract parameters from text description"""
