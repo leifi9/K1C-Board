@@ -1,5 +1,7 @@
 # K1C-Board
 
+**Version: 1.0.0** - Main Project
+
 K1C-Board is a platform for AI-powered agents and tools designed to automate complex tasks.
 
 ## Included Agents
@@ -14,8 +16,8 @@ Please refer to the `auto-3d-agent/README.md` for detailed instructions on the A
 ## Project Structure
 
 - `auto-3d-agent/`: 3D model generation agent using Blender and FreeCAD.
-- `step_analysis/`: Tools for analyzing STEP files.
-- Other directories and scripts for various agents and utilities.
+- `AGENTS.md`: Documentation of available agents in the platform.
+- `TODO.md`: Project development roadmap and completed tasks.
 
 ## License
 
