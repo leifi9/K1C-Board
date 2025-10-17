@@ -5,7 +5,6 @@ This module provides generators for parametric shapes like gears, springs, and t
 """
 
 import math
-import numpy as np
 from typing import Dict, Any, Tuple, List
 
 
