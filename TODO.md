@@ -10,7 +10,7 @@
 8. [x] Make retriever classes return empty data instead of crashing.
 9. [x] Add fallback for FreeCAD in export_to_cad.
 10. [x] Improve VideoProcessor and other stubs.
-11. [ ] Install Python, Blender, FreeCAD on the system (requires user action).
+11. [x] Install Python, Blender, FreeCAD on the system (requires user action).
 12. [ ] Run unit tests to verify fixes (requires Python).
 13. [ ] Run examples to test functionality (requires Blender).
 14. [ ] Test full pipeline (requires all dependencies).

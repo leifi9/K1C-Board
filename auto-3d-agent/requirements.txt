@@ -1,14 +1,18 @@
-Flask==2.0.1
-requests==2.25.1
-numpy==1.21.0
-opencv-python==4.5.3.20210927
-Pillow==8.2.0
-PyYAML==5.4.1
-pytest==6.2.4
-beautifulsoup4==4.10.0
-scikit-learn==0.24.2
+# Core dependencies for 3D Printing Adapter Expert System
+numpy>=1.24.0
+scipy>=1.10.0
 
-# Note: Blender and FreeCAD are required but not pip-installable.
-# Please install Blender 2.93+ from https://www.blender.org/download/
-# and FreeCAD from https://www.freecadweb.org/downloads.php
-# Ensure their Python modules (bpy for Blender, FreeCAD for FreeCAD) are accessible.
+# 3D Processing (install based on your needs)
+# trimesh>=3.21.0
+# open3d>=0.17.0
+
+# Blender - Install separately or use system Blender
+# bpy is available when running inside Blender
+
+# Optional: CAD libraries
+# freecad  # Install FreeCAD separately
+# cadquery>=2.3.0
+
+# Utilities
+dataclasses>=0.6
+typing-extensions>=4.5.0
