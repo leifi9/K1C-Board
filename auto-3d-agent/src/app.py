@@ -1,3 +1,9 @@
+"""
+Main application entry point for the Auto 3D Agent.
+
+This module provides the main function to run the 3D model generation system.
+"""
+
 from .ingestion.text_parser import TextParser
 from .ingestion.image_processor import ImageProcessor
 from .ingestion.video_processor import VideoProcessor
@@ -8,7 +14,14 @@ from .generator.blender_pipeline import BlenderPipeline
 from .cad_export.exporters import Exporters
 from .pipelines.pipeline import Pipeline
 
+
 def main():
+    """
+    Main function to run the Auto 3D Agent.
+    
+    This function initializes all components and orchestrates the workflow
+    to generate 3D models from input specifications.
+    """
     # Initialize components
     text_parser = TextParser()
     image_processor = ImageProcessor()
@@ -30,6 +43,9 @@ def main():
     # Generate and export the 3D model
     model = blender_pipeline.generate_model(input_data)
     exporters.export_to_step(model, "output.step")
+
+    print("3D model generation completed successfully.")
+
 
 if __name__ == "__main__":
     main()

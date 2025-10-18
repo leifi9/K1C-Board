@@ -31,17 +31,19 @@ auto-3d-agent
 
 ## Installation
 1. Clone the repository:
-   ```
-   git clone <repository-url>
+   ```bash
+   git clone https://github.com/leifi9/K1C-Board.git
    ```
 2. Navigate to the project directory:
-   ```
-   cd auto-3d-agent
+   ```bash
+   cd K1C-Board/auto-3d-agent
    ```
 3. Install the required dependencies:
-   ```
+   ```bash
    pip install -r requirements.txt
    ```
+   
+   **Note:** Blender and FreeCAD must be installed separately (see requirements.txt for details).
 
 ## Usage
 To run the Auto 3D Agent, execute the following script:
