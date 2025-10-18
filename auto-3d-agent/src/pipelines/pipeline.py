@@ -1,3 +1,10 @@
+"""
+Main pipeline for orchestrating the 3D model generation workflow.
+
+This module coordinates the entire process from input ingestion through
+data retrieval, model generation, and final CAD export.
+"""
+
 from ..ingestion.text_parser import TextParser
 from ..ingestion.image_processor import ImageProcessor
 from ..ingestion.video_processor import VideoProcessor
@@ -7,8 +14,14 @@ from ..retriever.reddit_fetcher import RedditFetcher
 from ..generator.blender_pipeline import BlenderPipeline
 from ..cad_export.exporters import Exporters
 
+
 class Pipeline:
+    """
+    Main pipeline for 3D model generation from various input sources.
+    """
+    
     def __init__(self):
+        """Initialize all pipeline components."""
         self.text_parser = TextParser()
         self.image_processor = ImageProcessor()
         self.video_processor = VideoProcessor()
@@ -19,6 +32,18 @@ class Pipeline:
         self.exporters = Exporters()
 
     def run(self, input_data):
+        """
+        Run the complete 3D model generation pipeline.
+        
+        Args:
+            input_data: Input data (str for text, bytes for image, list for video)
+            
+        Returns:
+            tuple: (step_file_path, obj_file_path) paths to exported models
+            
+        Raises:
+            ValueError: If input data type is not supported
+        """
         # Ingest input data
         if isinstance(input_data, str):
             parsed_data = self.text_parser.parse_text(input_data)

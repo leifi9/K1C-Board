@@ -1,5 +1,9 @@
 # Available Agents in K1C-Board
 
+**K1C-Board v1.0.0 - Main Project**
+
+This document lists all agents currently integrated into the K1C-Board platform.
+
 ## Auto 3D Agent
 - Description: Automated 3D model generation from text, images, and videos.
 - Technologies: Blender, FreeCAD, OpenCV, NLP.
