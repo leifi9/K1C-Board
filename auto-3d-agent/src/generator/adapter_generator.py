@@ -106,13 +106,10 @@ class AdapterGenerator:
     
     def _create_connection_cavity(self, obj, diameter: float, depth: float, location: str):
         """Create internal cavity for connection"""
-        # Enter edit mode
+        # Ensure we're in object mode and the target object is active
         bpy.context.view_layer.objects.active = obj
-        bpy.ops.object.mode_set(mode='EDIT')
-        
-        # Create cavity using bmesh
-        bm = bmesh.from_mesh(obj.data)
-        
+        bpy.ops.object.mode_set(mode='OBJECT')
+
         # Position cavity based on location
         if location == 'end_1':
             cavity_center = Vector((0, 0, depth/2))
@@ -120,7 +117,6 @@ class AdapterGenerator:
             cavity_center = Vector((0, 0, -depth/2))
         
         # Create cylinder for boolean subtraction
-        bpy.ops.object.mode_set(mode='OBJECT')
         bpy.ops.mesh.primitive_cylinder_add(
             radius=diameter/2,
             depth=depth,
@@ -386,11 +382,14 @@ class AdapterGenerator:
         bpy.ops.export_scene.obj(filepath=obj_path, use_selection=True)
         export_files['obj'] = obj_path
         
-        # Export 3MF (modern 3D printing format)
-        if hasattr(bpy.ops.export_mesh, 'threemf'):
-            threemf_path = os.path.join(output_path, f"{obj_name}.3mf")
-            bpy.ops.export_mesh.threemf(filepath=threemf_path, use_selection=True)
-            export_files['3mf'] = threemf_path
+        # Export 3MF (modern 3D printing format) if available
+        try:
+            if hasattr(bpy.ops.export_mesh, 'threemf'):
+                threemf_path = os.path.join(output_path, f"{obj_name}.3mf")
+                bpy.ops.export_mesh.threemf(filepath=threemf_path, use_selection=True)
+                export_files['3mf'] = threemf_path
+        except Exception as e:
+            print(f"3MF export skipped: {e}")
         
         return export_files
 

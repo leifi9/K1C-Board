@@ -1,11 +1,11 @@
-from ..ingestion.text_parser import TextParser
-from ..ingestion.image_processor import ImageProcessor
-from ..ingestion.video_processor import VideoProcessor
-from ..retriever.web_search import WebSearch
-from ..retriever.github_fetcher import GitHubFetcher
-from ..retriever.reddit_fetcher import RedditFetcher
-from ..generator.blender_pipeline import BlenderPipeline
-from ..cad_export.exporters import Exporters
+from ingestion.text_parser import TextParser
+from ingestion.image_processor import ImageProcessor
+from ingestion.video_processor import VideoProcessor
+from retriever.web_search import WebSearch
+from retriever.github_fetcher import GitHubFetcher
+from retriever.reddit_fetcher import RedditFetcher
+from generator.blender_pipeline import BlenderPipeline
+from cad_export.exporters import Exporters
 
 class Pipeline:
     def __init__(self):
