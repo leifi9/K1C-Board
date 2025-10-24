@@ -58,7 +58,7 @@ import api from '@services/api';
 import type { Config } from '@app-types/index';
 ```
 
-Note: Use `@app-types/*` not `@types/*` to avoid TS6137 error.
+Note: Use `@app-types/*` not `@types/*` to avoid TypeScript error TS6137 (conflicts with built-in type declaration packages).
 
 ## API Endpoints
 

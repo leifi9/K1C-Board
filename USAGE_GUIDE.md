@@ -51,8 +51,8 @@ pip install -r requirements.txt
 ### Step 3: (Optional) Install Blender and FreeCAD
 
 For full functionality, install:
-- **Blender** - For 3D modeling capabilities
-- **FreeCAD** - For CAD file export
+- **Blender 3.0+** - [Download for Windows/Mac/Linux](https://www.blender.org/download/)
+- **FreeCAD 0.20+** - [Download for Windows/Mac/Linux](https://www.freecad.org/downloads.php)
 
 Without these, the webapp will run in mock mode for testing.
 
@@ -212,15 +212,19 @@ This is expected if Blender isn't installed. The server runs in mock mode.
 
 Edit `webapp/server.py`:
 ```python
-app.run(host='0.0.0.0', port=5000, debug=True)
+app.run(host='0.0.0.0', port=5000, debug=True)  # Change port here
 ```
 
 And update `webapp/webpack.config.js`:
 ```javascript
-proxy: [{
-  context: ['/api'],
-  target: 'http://localhost:5000'  // Change port here
-}]
+devServer: {
+  // ... other settings
+  proxy: [{
+    context: ['/api'],
+    target: 'http://localhost:5000',  // Change port here
+    changeOrigin: true,
+  }],
+}
 ```
 
 ### Changing Frontend Port
@@ -255,7 +259,25 @@ API_BASE_URL=http://localhost:5000
 MAX_FILE_SIZE=104857600
 ```
 
-Update `webpack.config.js` to load these if needed.
+To use these in webpack, install `dotenv-webpack`:
+```bash
+npm install --save-dev dotenv-webpack
+```
+
+Then update `webpack.config.js`:
+```javascript
+const Dotenv = require('dotenv-webpack');
+
+module.exports = {
+  // ... other config
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './public/index.html',
+    }),
+    new Dotenv(),  // Add this
+  ],
+};
+```
 
 ## Development Tips
 
