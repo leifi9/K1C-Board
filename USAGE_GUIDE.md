@@ -73,6 +73,11 @@ Open two terminal windows:
 **Terminal 1 - Backend Server:**
 ```bash
 cd webapp
+# For development with debug mode
+export FLASK_DEBUG=true
+python server.py
+
+# For production (debug mode disabled by default)
 python server.py
 ```
 

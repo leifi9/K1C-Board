@@ -131,9 +131,10 @@ def generate_model():
                 })
             
             except Exception as e:
+                app.logger.error(f'Generation failed: {str(e)}')
                 return jsonify({
                     'success': False,
-                    'error': f'Generation failed: {str(e)}'
+                    'error': 'Generation failed. Please check your input and try again.'
                 }), 500
         else:
             # Mock response for testing without backend
@@ -146,9 +147,10 @@ def generate_model():
             })
     
     except Exception as e:
+        app.logger.error(f'Error in generate_model: {str(e)}')
         return jsonify({
             'success': False,
-            'error': str(e)
+            'error': 'An error occurred during model generation. Please try again.'
         }), 500
 
 @app.route('/api/progress/<job_id>', methods=['GET'])
@@ -177,7 +179,8 @@ def list_outputs():
         
         return jsonify({'outputs': outputs})
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        app.logger.error(f'Error listing outputs: {str(e)}')
+        return jsonify({'error': 'Failed to list output files'}), 500
 
 @app.errorhandler(413)
 def file_too_large(e):
@@ -188,9 +191,13 @@ def internal_error(e):
     return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
+    import os
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    
     print("Starting K1C-Board API Server...")
     print(f"Upload folder: {UPLOAD_FOLDER}")
     print(f"Output folder: {OUTPUT_FOLDER}")
     print(f"Backend mode: {'available' if AdapterCreationApp else 'mock'}")
+    print(f"Debug mode: {debug_mode}")
     
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode)
