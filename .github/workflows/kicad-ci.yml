@@ -1,0 +1,44 @@
+name: KiCad ERC/DRC & Fab Exports
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  kicad:
+    runs-on: ubuntu-latest
+    container:
+      image: kicad/kicad:9.0-full
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare dirs
+        run: mkdir -p out/gerbers out/reports out/plots
+      - name: Run ERC
+        run: |
+          kicad-cli sch erc --exit-code-violations \
+            -o out/reports/erc.rpt $(git ls-files '*.kicad_sch' | head -n1)
+      - name: Run DRC
+        run: |
+          kicad-cli pcb drc --exit-code-violations \
+            -o out/reports/drc.rpt $(git ls-files '*.kicad_pcb' | head -n1)
+      - name: Export Gerbers & Drill
+        run: |
+          pcb=$(git ls-files '*.kicad_pcb' | head -n1)
+          kicad-cli pcb export gerbers -o out/gerbers "$pcb"
+          kicad-cli pcb export drill   -o out/gerbers "$pcb"
+      - name: Export BOM (CSV)
+        run: |
+          sch=$(git ls-files '*.kicad_sch' | head -n1)
+          kicad-cli sch export bom --format csv -o out/bom.csv "$sch"
+      - name: Plot board SVGs
+        run: |
+          pcb=$(git ls-files '*.kicad_pcb' | head -n1)
+          kicad-cli pcb export svg --layers F.Cu,F.SilkS,Edge.Cuts -o out/plots/top.svg "$pcb"
+          kicad-cli pcb export svg --layers B.Cu,B.SilkS,Edge.Cuts -o out/plots/bot.svg "$pcb"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kicad-artifacts
+          path: out/**
