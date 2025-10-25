@@ -20,8 +20,74 @@ from ingestion.cad_processor import CADProcessor, AdapterSpec
 from retriever.web_search import WebSearch
 from retriever.github_fetcher import GitHubFetcher
 from retriever.reddit_fetcher import RedditFetcher
-from generator.blender_pipeline import BlenderPipeline
-from generator.adapter_generator import AdapterGenerator
+try:
+    from generator.adapter_generator import AdapterGenerator as _BlenderAdapterGenerator
+
+    class AdapterGenerator(_BlenderAdapterGenerator):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self.uses_blender = True
+except ImportError:
+
+    class AdapterGenerator:  # type: ignore[override]
+        """Fallback adapter generator that outputs placeholder geometry."""
+
+        _PLACEHOLDER_STL = (
+            "solid adapter_placeholder\n"
+            "  facet normal 0 0 1\n"
+            "    outer loop\n"
+            "      vertex 0 0 0\n"
+            "      vertex 10 0 0\n"
+            "      vertex 0 10 0\n"
+            "    endloop\n"
+            "  endfacet\n"
+            "endsolid adapter_placeholder\n"
+        )
+        _PLACEHOLDER_OBJ = (
+            "# Adapter placeholder\n"
+            "o AdapterPlaceholder\n"
+            "v 0.0 0.0 0.0\n"
+            "v 10.0 0.0 0.0\n"
+            "v 0.0 10.0 0.0\n"
+            "f 1 2 3\n"
+        )
+
+        def __init__(self) -> None:
+            self.uses_blender = False
+
+        def generate_adapter(self, geometry: Dict, output_path: str) -> Dict:
+            output_dir = Path(output_path)
+            output_dir.mkdir(parents=True, exist_ok=True)
+            base_name = geometry.get('type') or 'adapter_placeholder'
+            safe_name = str(base_name).replace(' ', '_')
+            stl_path = output_dir / f"{safe_name}.stl"
+            if not stl_path.exists():
+                stl_path.write_text(self._PLACEHOLDER_STL, encoding='utf-8')
+            obj_path = output_dir / f"{safe_name}.obj"
+            if not obj_path.exists():
+                obj_path.write_text(self._PLACEHOLDER_OBJ, encoding='utf-8')
+            return {
+                'success': True,
+                'adapter_name': safe_name,
+                'geometry_type': geometry.get('type', 'placeholder'),
+                'print_optimization': {
+                    'orientation': geometry.get('print_orientation', 'auto'),
+                    'notes': ['Generated placeholder geometry because Blender is unavailable.'],
+                    'print_time_estimate': 'N/A',
+                },
+                'export_files': {
+                    'stl': str(stl_path),
+                    'obj': str(obj_path),
+                },
+                'recommendations': [
+                    'Install Blender to enable full geometry synthesis.',
+                    'Treat this placeholder model as a stub for UI validation only.',
+                ],
+            }
+
+        def clear_scene(self) -> None:
+            return None
+
 from cad_export.exporters import Exporters
 from cad_export.step_exporter import *
 from cad_export.stl_exporter import STLExporter
@@ -77,7 +143,6 @@ class AdapterCreationApp:
         self.reddit_fetcher = RedditFetcher()
         
         # 3D generators
-        self.blender_pipeline = BlenderPipeline()
         self.adapter_generator = AdapterGenerator()
         
         # Exporters
@@ -86,8 +151,15 @@ class AdapterCreationApp:
         
         # Pipeline orchestrator
         self.pipeline = Pipeline()
+        self.blender_available = getattr(self.adapter_generator, "uses_blender", True) and getattr(self.pipeline, "blender_available", True)
+
+        if not getattr(self.adapter_generator, "uses_blender", True):
+            print("[adapter] Blender runtime unavailable; using placeholder adapter generator.")
+        if not getattr(self.pipeline, "blender_available", True):
+            print("[adapter] Pipeline running in placeholder mode; geometry will be mocked.")
+
         
-        print("✅ All components initialized successfully")
+        print("[ok] All components initialized successfully")
     
     def create_adapter_from_dual_cad(self, cad_file_1: str, cad_file_2: str, 
                                    adapter_spec: AdapterSpec = None, 
@@ -129,7 +201,10 @@ class AdapterCreationApp:
             output_path.mkdir(exist_ok=True)
             
             # Step 3: Generate 3D model using Blender
-            print("🎨 Creating 3D model with Blender...")
+            if getattr(self.adapter_generator, "uses_blender", True):
+                print("🎨 Creating 3D model with Blender...")
+            else:
+                print("🎨 Creating placeholder geometry (Blender unavailable)...")
             generation_result = self.adapter_generator.generate_adapter(
                 adapter_geometry, str(output_path)
             )
