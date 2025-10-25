@@ -166,7 +166,7 @@ class AdapterCreationApp:
                                    output_name: str = "custom_adapter") -> Dict:
         """Main workflow for creating adapter from two CAD files"""
         
-        print(f"🔧 Starting adapter creation workflow...")
+        print(f"Starting adapter creation workflow...")
         print(f"   Input 1: {cad_file_1}")
         print(f"   Input 2: {cad_file_2}")
         
@@ -182,7 +182,7 @@ class AdapterCreationApp:
         
         try:
             # Step 1: Process dual CAD inputs
-            print("📐 Processing CAD inputs...")
+            print("Processing CAD inputs...")
             cad_result = self.cad_processor.process_dual_cad_input(
                 cad_file_1, cad_file_2, adapter_spec
             )
@@ -190,10 +190,10 @@ class AdapterCreationApp:
             if not cad_result['success']:
                 return {'success': False, 'error': 'CAD processing failed', 'details': cad_result}
             
-            print(f"   ✅ Detected {len(cad_result['detected_interfaces'])} connection interfaces")
+            print(f"   Detected {len(cad_result['detected_interfaces'])} connection interfaces")
             
             # Step 2: Generate adapter geometry
-            print("🏗️ Generating adapter geometry...")
+            print("Generating adapter geometry...")
             adapter_geometry = cad_result['adapter_geometry']
             
             # Create output path
@@ -202,9 +202,9 @@ class AdapterCreationApp:
             
             # Step 3: Generate 3D model using Blender
             if getattr(self.adapter_generator, "uses_blender", True):
-                print("🎨 Creating 3D model with Blender...")
+                print("Creating 3D model with Blender...")
             else:
-                print("🎨 Creating placeholder geometry (Blender unavailable)...")
+                print("Creating placeholder geometry (Blender unavailable)...")
             generation_result = self.adapter_generator.generate_adapter(
                 adapter_geometry, str(output_path)
             )
@@ -213,7 +213,7 @@ class AdapterCreationApp:
                 return {'success': False, 'error': 'Adapter generation failed', 'details': generation_result}
             
             # Step 4: Export in multiple formats
-            print("💾 Exporting files...")
+            print("Exporting files...")
             export_results = {}
             
             # Export STL (primary for 3D printing)
@@ -224,7 +224,7 @@ class AdapterCreationApp:
                 export_results['stl'] = {'file_path': str(stl_path), 'format': 'STL'}
             
             # Step 5: Generate comprehensive report
-            print("📋 Generating report...")
+            print("Generating report...")
             report = self._generate_adapter_report(
                 cad_result, generation_result, export_results, adapter_spec, output_name
             )
@@ -234,7 +234,7 @@ class AdapterCreationApp:
             with open(report_path, 'w') as f:
                 json.dump(report, f, indent=2, default=str)
             
-            print(f"🎉 Adapter creation completed successfully!")
+            print(f"Adapter creation completed successfully!")
             print(f"   Output directory: {output_path}")
             print(f"   Report: {report_path}")
             
@@ -256,7 +256,7 @@ class AdapterCreationApp:
                                output_name: str = "modification_part") -> Dict:
         """Create a modification/upgrade part for an existing component"""
         
-        print(f"🔧 Creating modification part for: {base_cad_file}")
+        print(f"Creating modification part for: {base_cad_file}")
         
         try:
             # Process the base CAD file
@@ -274,7 +274,7 @@ class AdapterCreationApp:
             )
             
             if generation_result['success']:
-                print(f"✅ Modification part created: {output_path}")
+                print(f"Modification part created: {output_path}")
                 return {
                     'success': True,
                     'output_path': str(output_path),
@@ -385,7 +385,7 @@ class AdapterCreationApp:
     def create_sample_adapter(self, adapter_type: str = "cylindrical") -> Dict:
         """Create a sample adapter for testing"""
         
-        print(f"🧪 Creating sample {adapter_type} adapter...")
+        print(f"Creating sample {adapter_type} adapter...")
         
         # Create sample geometry
         if adapter_type == "cylindrical":
@@ -415,7 +415,7 @@ class AdapterCreationApp:
         result = self.adapter_generator.generate_adapter(sample_geometry, str(output_path))
         
         if result['success']:
-            print(f"✅ Sample adapter created: {output_path}")
+            print(f"Sample adapter created: {output_path}")
         
         return result
 
@@ -439,7 +439,7 @@ def main():
     # Initialize the application
     app = AdapterCreationApp(args.config)
     
-    print("🏭 3D Printing Adapter Creation Tool")
+    print("3D Printing Adapter Creation Tool")
     print("=" * 50)
     
     if args.mode == 'dual-cad':
@@ -462,7 +462,7 @@ def main():
         )
         
         if result['success']:
-            print("\n🎉 Success! Adapter created successfully.")
+            print("\n Success! Adapter created successfully.")
             print(f"Check output directory: {result['output_path']}")
         else:
             print(f"\n❌ Failed: {result['error']}")
@@ -480,7 +480,7 @@ def main():
         result = app.create_modification_part(args.input1, modification_spec, args.output)
         
         if result['success']:
-            print("\n🎉 Success! Modification part created.")
+            print("\n Success! Modification part created.")
         else:
             print(f"\n❌ Failed: {result['error']}")
     
@@ -489,12 +489,12 @@ def main():
         result = app.create_sample_adapter("cylindrical")
         
         if result['success']:
-            print("\n🎉 Sample adapter created successfully!")
+            print("\n Sample adapter created successfully!")
         else:
             print(f"\n❌ Failed to create sample: {result.get('error', 'Unknown error')}")
     
     print("\n" + "=" * 50)
-    print("Done! 🔧")
+    print("Done!")
 
 if __name__ == "__main__":
     main()
